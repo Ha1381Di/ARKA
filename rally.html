@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#07101c">
+<meta name="description" content="RALLY — Where every circle finds its center.">
+<title>RALLY — Where every circle finds its center.</title>
+
+<!-- PWA -->
+<link rel="manifest" id="pwaManifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RALLY">
+<meta name="application-name" content="RALLY">
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%2307101c'/%3E%3Ccircle%20cx='32'%20cy='32'%20r='22'%20fill='none'%20stroke='%237cc4ff'%20stroke-width='4'%20opacity='.35'/%3E%3Ccircle%20cx='32'%20cy='32'%20r='14'%20fill='none'%20stroke='%23f5b759'%20stroke-width='4'%20opacity='.6'/%3E%3Ccircle%20cx='32'%20cy='32'%20r='6'%20fill='%236ee7d3'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20180%20180'%3E%3Crect%20width='180'%20height='180'%20rx='36'%20fill='%2307101c'/%3E%3Ccircle%20cx='90'%20cy='90'%20r='62'%20fill='none'%20stroke='%237cc4ff'%20stroke-width='10'%20opacity='.35'/%3E%3Ccircle%20cx='90'%20cy='90'%20r='38'%20fill='none'%20stroke='%23f5b759'%20stroke-width='10'%20opacity='.6'/%3E%3Ccircle%20cx='90'%20cy='90'%20r='16'%20fill='%236ee7d3'/%3E%3C/svg%3E">
+
+<style>
+:root {
+  --bg:#07101c;--surface:rgba(255,255,255,0.04);--surface-2:rgba(255,255,255,0.08);
+  --border:rgba(255,255,255,0.08);--text:#e8eef7;--text-dim:#9aa7b8;
+  --accent:#6ee7d3;--accent-2:#7cc4ff;--amber:#f5b759;--red:#f06292;
+  --radius:20px;--ease:cubic-bezier(0.22,1,0.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans",Arial,sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+#living-canvas{position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,#07101c 0%,#0a1929 50%,#071420 100%);overflow:hidden}
+#living-canvas::before{content:'';position:absolute;inset:-20%;
+  background:radial-gradient(circle at 20% 30%,rgba(110,231,211,0.13),transparent 45%),
+             radial-gradient(circle at 80% 70%,rgba(124,196,255,0.11),transparent 50%),
+             radial-gradient(circle at 50% 100%,rgba(245,183,89,0.07),transparent 40%);
+  animation:drift 32s ease-in-out infinite alternate;will-change:transform}
+@keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(2%,-2%) scale(1.05)}100%{transform:translate(-2%,2%) scale(1.02)}}
+#particles{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:0.55}
+
+.progress-rail{position:fixed;top:50%;right:18px;transform:translateY(-50%);z-index:50;
+  display:flex;flex-direction:column;gap:10px;align-items:center}
+[dir="rtl"] .progress-rail{right:auto;left:18px}
+.progress-rail .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.16);
+  cursor:pointer;transition:all 0.3s var(--ease);border:none;padding:0}
+.progress-rail .dot:hover{background:rgba(255,255,255,0.4)}
+.progress-rail .dot.active{background:var(--accent);box-shadow:0 0 12px var(--accent);width:10px;height:10px}
+@media(max-width:768px){.progress-rail{display:none}}
+
+.site-header{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px clamp(16px,4vw,40px);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  background:rgba(7,16,28,0.6);border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:3px;font-size:1.2rem;flex-shrink:0}
+.brand-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 14px var(--accent);animation:pulse-dot 3s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+.header-actions{display:flex;align-items:center;gap:8px;min-width:0}
+
+.status-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;
+  background:var(--surface);border:1px solid var(--border);font-size:.72rem;color:var(--text-dim);
+  white-space:nowrap;transition:all .3s var(--ease);font-weight:500}
+.status-chip i{width:7px;height:7px;border-radius:50%;background:#6b7889;display:block;flex-shrink:0}
+.status-chip.online i{background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.status-chip.offline i{background:var(--amber)}
+.status-chip.connecting i{background:var(--accent-2);animation:pulse-dot 1.2s infinite}
+.status-chip.unconfigured{opacity:.65}
+@media (max-width:520px){.status-chip span{display:none}.status-chip{padding:6px 7px}}
+
+.install-btn{padding:8px 14px;border-radius:12px;border:none;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#07101c;font-weight:700;font-size:.78rem;cursor:pointer;
+  font-family:inherit;transition:transform .2s var(--ease);white-space:nowrap}
+.install-btn:hover{transform:translateY(-1px)}
+.install-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:520px){.install-btn{padding:6px 10px;font-size:.72rem}}
+
+.lang-select{padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--border);
+  color:var(--text);font-size:0.82rem;cursor:pointer;font-family:inherit;max-width:110px}
+.lang-select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.siren-mini{width:38px;height:38px;border-radius:50%;border:none;flex-shrink:0;
+  background:linear-gradient(135deg,#f06292,#b71c1c);color:#fff;cursor:pointer;
+  display:grid;place-items:center;font-size:1.05rem;
+  box-shadow:0 0 20px rgba(240,98,146,.35);transition:transform .2s var(--ease);
+  animation:siren-breathe 4s ease-in-out infinite}
+@keyframes siren-breathe{0%,100%{box-shadow:0 0 18px rgba(240,98,146,.35)}50%{box-shadow:0 0 30px rgba(240,98,146,.65)}}
+.siren-mini:hover{transform:scale(1.06)}
+.siren-mini:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+
+main{padding-top:72px}
+section{padding:clamp(60px,10vh,120px) clamp(16px,5vw,60px);max-width:1200px;margin:0 auto;
+  min-height:80vh;display:flex;flex-direction:column;justify-content:center}
+
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.in{opacity:1;transform:translateY(0)}
+.reveal-stagger > *{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal-stagger.in > *{opacity:1;transform:translateY(0)}
+.reveal-stagger.in > *:nth-child(1){transition-delay:0ms}
+.reveal-stagger.in > *:nth-child(2){transition-delay:80ms}
+.reveal-stagger.in > *:nth-child(3){transition-delay:160ms}
+.reveal-stagger.in > *:nth-child(4){transition-delay:240ms}
+.reveal-stagger.in > *:nth-child(5){transition-delay:320ms}
+.reveal-stagger.in > *:nth-child(6){transition-delay:400ms}
+
+.hero{text-align:center;min-height:90vh}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;
+  background:var(--surface);border:1px solid var(--border);font-size:.85rem;color:var(--text-dim);margin-bottom:24px}
+.hero-badge .pulse{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse-dot 2s ease-in-out infinite}
+.hero h1{font-size:clamp(2.4rem,7vw,4.5rem);font-weight:800;letter-spacing:-.02em;line-height:1.1;
+  margin-bottom:20px;background:linear-gradient(135deg,#fff 0%,var(--accent) 50%,var(--accent-2) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .tagline{font-size:clamp(1.1rem,2.5vw,1.4rem);color:var(--text-dim);
+  max-width:640px;margin:0 auto 40px;font-style:italic}
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+.btn{padding:14px 28px;border-radius:14px;border:none;font-size:1rem;font-weight:600;cursor:pointer;
+  transition:all .2s var(--ease);font-family:inherit;text-decoration:none;display:inline-block;text-align:center}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#07101c;
+  box-shadow:0 8px 30px rgba(110,231,211,.25)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(110,231,211,.4)}
+.btn-ghost{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{background:var(--surface-2);transform:translateY(-2px)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.section-head{text-align:center;margin-bottom:clamp(40px,6vh,60px)}
+.section-head .eyebrow{display:inline-block;font-size:.8rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--accent);margin-bottom:12px;font-weight:600}
+.section-head h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;margin-bottom:12px;letter-spacing:-.01em}
+.section-head p{color:var(--text-dim);max-width:640px;margin:0 auto}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  transition:transform .3s var(--ease),background .3s var(--ease)}
+.card:hover{background:var(--surface-2);transform:translateY(-2px)}
+.grid{display:grid;gap:20px}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+
+.rings-container{display:flex;flex-direction:column;align-items:center;gap:40px}
+.rings-svg{width:min(400px,80vw);height:min(400px,80vw)}
+.ring-track{fill:none;stroke:rgba(255,255,255,.06);stroke-width:12}
+.ring-fill{fill:none;stroke-width:12;stroke-linecap:round;
+  transform:rotate(-90deg);transform-origin:100px 100px;
+  transition:stroke-dashoffset 1.2s var(--ease)}
+.rings-legend{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%;max-width:480px}
+.legend-item{display:flex;align-items:center;gap:10px;padding:12px 16px;
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;font-size:.9rem}
+.legend-swatch{width:10px;height:10px;border-radius:50%}
+
+.field{margin-bottom:18px}
+.field label{display:block;font-size:.85rem;color:var(--text-dim);margin-bottom:8px;font-weight:500}
+.field input,.field textarea{width:100%;padding:12px 16px;background:rgba(0,0,0,.3);
+  border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:1rem;
+  font-family:inherit;transition:border-color .2s var(--ease),box-shadow .2s var(--ease)}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(110,231,211,.15)}
+.field textarea{resize:vertical;min-height:80px}
+.input-row{display:flex;gap:8px}
+.input-row input{flex:1;min-width:0}
+.input-row .btn{padding:12px 14px;font-size:.82rem;white-space:nowrap;flex-shrink:0}
+
+.note{font-size:.8rem;color:var(--text-dim);line-height:1.5;margin:4px 0 16px}
+.warn{font-size:.8rem;color:var(--amber);background:rgba(245,183,89,.1);
+  border:1px solid rgba(245,183,89,.25);border-radius:10px;padding:10px 12px;margin-bottom:14px;display:none}
+
+.member-row{display:flex;align-items:center;gap:12px;padding:12px 14px;
+  background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:12px;margin-bottom:8px}
+.member-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(110,231,211,.25),rgba(124,196,255,.2));
+  display:grid;place-items:center;font-weight:700;font-size:.85rem;color:var(--accent)}
+.member-info{min-width:0;flex:1}
+.member-name{font-weight:600;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.member-phone{color:var(--text-dim);font-size:.78rem;direction:ltr;text-align:left}
+[dir="rtl"] .member-phone{text-align:right}
+.member-del{width:28px;height:28px;border-radius:50%;border:none;flex-shrink:0;
+  background:rgba(240,98,146,.12);color:var(--red);cursor:pointer;font-size:1rem;
+  display:grid;place-items:center;transition:all .2s var(--ease)}
+.member-del:hover{background:rgba(240,98,146,.3)}
+.empty-note{color:var(--text-dim);font-size:.85rem;padding:12px 0}
+
+.kit-list{display:flex;flex-direction:column;gap:10px}
+.kit-item{display:flex;align-items:center;gap:14px;padding:14px 18px;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  cursor:pointer;transition:background .2s var(--ease)}
+.kit-item:hover{background:var(--surface-2)}
+.kit-item input[type="checkbox"]{width:20px;height:20px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.kit-item label{flex:1;cursor:pointer;font-size:.95rem}
+.kit-item.done label{text-decoration:line-through;color:var(--text-dim)}
+.kit-item .expiry{font-size:.75rem;padding:3px 10px;border-radius:999px;
+  background:rgba(245,183,89,.15);color:var(--amber);white-space:nowrap}
+
+.siren-section{text-align:center}
+.siren-big{width:clamp(180px,40vw,240px);height:clamp(180px,40vw,240px);border-radius:50%;border:none;
+  background:radial-gradient(circle at 35% 30%,#ff8a9e,#c2185b 60%,#880e4f);color:#fff;
+  font-size:1.1rem;font-weight:700;cursor:pointer;display:grid;place-items:center;
+  margin:0 auto 24px;position:relative;box-shadow:0 20px 60px rgba(240,98,146,.35);
+  transition:transform .2s var(--ease);user-select:none;-webkit-user-select:none;touch-action:none}
+.siren-big::before,.siren-big::after{content:'';position:absolute;inset:-12px;border-radius:50%;
+  border:2px solid rgba(240,98,146,.3);animation:ripple 3s ease-out infinite;pointer-events:none}
+.siren-big::after{animation-delay:1.5s}
+@keyframes ripple{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.5);opacity:0}}
+.siren-big:active{transform:scale(.96)}
+.siren-big.holding{background:radial-gradient(circle at 35% 30%,#ffb3bf,#e91e63 60%,#ad1457);
+  box-shadow:0 0 80px rgba(240,98,146,.7)}
+.siren-big .hold-ring{position:absolute;inset:0;border-radius:50%;pointer-events:none}
+.siren-big .hold-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.siren-big .hold-ring circle{fill:none;stroke:rgba(255,255,255,.85);stroke-width:6;
+  stroke-linecap:round;stroke-dasharray:603;stroke-dashoffset:603}
+.siren-big.holding .hold-ring circle{transition:stroke-dashoffset 2s linear;stroke-dashoffset:0}
+.siren-hint{color:var(--text-dim);font-size:.9rem;margin-bottom:24px}
+.siren-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.siren-reason{padding:10px 18px;border-radius:999px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text);font-size:.85rem;cursor:pointer;
+  transition:all .2s var(--ease);font-family:inherit}
+.siren-reason:hover{background:var(--surface-2)}
+.siren-reason.selected{background:rgba(240,98,146,.2);border-color:var(--red);color:var(--red)}
+
+.siren-overlay{position:fixed;inset:0;z-index:1000;background:rgba(30,0,10,0.94);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .3s var(--ease);overflow-y:auto}
+.siren-overlay.show{opacity:1;pointer-events:auto}
+.siren-overlay-box{text-align:center;max-width:520px;width:100%;padding:36px 22px;
+  border-radius:28px;background:rgba(240,98,146,0.08);
+  border:2px solid rgba(240,98,146,0.4);margin:auto;
+  animation:siren-pulse-bg 1s ease-in-out infinite alternate}
+@keyframes siren-pulse-bg{
+  from{box-shadow:0 0 40px rgba(240,98,146,0.4)}
+  to{box-shadow:0 0 100px rgba(240,98,146,0.8)}}
+.siren-overlay-box .siren-icon{font-size:3.4rem;margin-bottom:10px;display:block;
+  animation:siren-shake .4s ease-in-out infinite alternate}
+@keyframes siren-shake{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+.siren-overlay-box h2{color:#fff;font-size:1.7rem;margin-bottom:8px;letter-spacing:.08em}
+.siren-overlay-box .siren-from{color:#ffd7e0;font-size:.85rem;margin-bottom:6px;min-height:1em}
+.siren-overlay-box .siren-reason-text{color:#fff;font-size:1.25rem;font-weight:700;margin-bottom:14px}
+.siren-overlay-box .siren-countdown{color:var(--amber);font-size:.9rem;margin-bottom:18px}
+.siren-overlay-box .siren-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.siren-overlay-box .btn{padding:12px 22px;font-size:.92rem}
+
+.sms-panel{margin-top:18px;text-align:left;background:rgba(0,0,0,.32);
+  border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px;display:none}
+[dir="rtl"] .sms-panel{text-align:right}
+.sms-panel.show{display:block}
+.sms-panel h4{color:#fff;font-size:.92rem;margin-bottom:4px}
+.sms-panel p{color:#ffd7e0;font-size:.78rem;margin-bottom:10px;line-height:1.45}
+.sms-link{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:9px 12px;margin-bottom:6px;border-radius:10px;background:rgba(255,255,255,.07);
+  color:#fff;text-decoration:none;font-size:.85rem;transition:background .2s var(--ease)}
+.sms-link:hover{background:rgba(255,255,255,.16)}
+.sms-link span:last-child{font-size:.75rem;color:var(--accent)}
+
+.drill-timer{text-align:center;font-size:clamp(3rem,10vw,5rem);font-weight:800;
+  letter-spacing:.05em;font-variant-numeric:tabular-nums;margin:20px 0;color:var(--accent)}
+
+.hub-post{padding:16px 18px;background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;margin-bottom:12px}
+.hub-post-head{display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:8px;font-size:.85rem}
+.hub-post-author{font-weight:600}
+.hub-post-time{color:var(--text-dim)}
+
+.shelter-card{position:relative}
+.shelter-card h3{margin-bottom:8px;padding-right:36px}
+[dir="rtl"] .shelter-card h3{padding-right:0;padding-left:36px}
+.shelter-card .shelter-meta{color:var(--text-dim);font-size:.9rem;margin-bottom:12px}
+.shelter-delete{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;
+  border:none;background:rgba(240,98,146,.15);color:var(--red);cursor:pointer;
+  display:grid;place-items:center;font-size:1rem;transition:all .2s var(--ease)}
+[dir="rtl"] .shelter-delete{right:auto;left:12px}
+.shelter-delete:hover{background:rgba(240,98,146,.35);transform:scale(1.1)}
+
+.checkbox-row{display:flex;gap:20px;margin-bottom:16px;flex-wrap:wrap}
+.checkbox-row label{display:flex;align-items:center;gap:8px;cursor:pointer;
+  font-size:.9rem;color:var(--text)}
+
+.emergency-card{padding:24px;background:linear-gradient(135deg,rgba(110,231,211,.1),rgba(124,196,255,.05));
+  border:2px solid var(--border);border-radius:var(--radius);
+  display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}
+.qr-placeholder{width:120px;height:120px;background:#fff;border-radius:12px;
+  display:grid;place-items:center;color:#07101c;font-weight:800;font-size:.7rem;
+  text-align:center;padding:8px}
+
+footer{text-align:center;padding:40px 20px;color:var(--text-dim);font-size:.85rem;
+  border-top:1px solid var(--border);margin-top:60px}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  padding:14px 24px;background:var(--surface-2);backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:14px;
+  z-index:1200;opacity:0;transition:all .4s var(--ease);font-weight:500;
+  max-width:90vw;pointer-events:none;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;scroll-behavior:auto !important}
+  .reveal,.reveal-stagger > *{opacity:1 !important;transform:none !important}
+}
+@media (max-width:640px){
+  .legend-item{padding:10px 12px;font-size:.8rem}
+  .emergency-card{grid-template-columns:1fr;text-align:center}
+  .qr-placeholder{margin:0 auto}
+  section{min-height:auto;padding-top:70px;padding-bottom:70px}
+  .rings-legend{grid-template-columns:1fr}
+  .input-row{flex-wrap:wrap}
+  .input-row .btn{width:100%}
+}
+@media print{
+  .site-header,footer,.progress-rail,#living-canvas,#particles,.toast,.btn,.siren-overlay,.install-btn{display:none !important}
+  body{background:#fff !important;color:#000 !important}
+  main{padding:0 !important}
+  section{display:none !important;padding:20px !important;min-height:auto !important}
+  #sec-card{display:block !important}
+  .emergency-card{background:#fff !important;border:2px solid #333 !important;color:#000 !important}
+  .qr-placeholder{background:#eee !important;border:1px solid #999 !important;color:#000 !important}
+  *{color:#000 !important}
+}
+</style>
+</head>
+<body>
+
+<div id="living-canvas"></div>
+<canvas id="particles"></canvas>
+<nav class="progress-rail" id="progressRail" aria-label="Section navigation"></nav>
+
+<header class="site-header">
+  <div class="brand"><span class="brand-dot"></span>RALLY</div>
+  <div class="header-actions">
+    <span class="status-chip unconfigured" id="statusChip" role="status"><i></i><span>—</span></span>
+    <button class="install-btn" id="installBtn" hidden>Install</button>
+    <select class="lang-select" id="langSelect" aria-label="Language">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+      <option value="zh">中文</option>
+      <option value="hi">हिन्दी</option>
+      <option value="ar">العربية</option>
+      <option value="fa">فارسی</option>
+    </select>
+    <button class="siren-mini" id="sirenMini" aria-label="Emergency siren">🚨</button>
+  </div>
+</header>
+
+<main>
+
+<section class="hero" id="sec-hero" data-section="hero">
+  <div class="hero-badge reveal"><span class="pulse"></span><span data-i18n="hero_badge">Free · Private · Offline-ready</span></div>
+  <h1 class="reveal" data-i18n="hero_title">RALLY</h1>
+  <p class="tagline reveal" data-i18n="hero_tagline">Where every circle finds its center.</p>
+  <div class="hero-cta reveal">
+    <a href="#sec-plan" class="btn btn-primary" data-i18n="cta_start">Start your plan</a>
+    <a href="#sec-circle" class="btn btn-ghost" data-i18n="cta_siren">Set up Siren</a>
+  </div>
+</section>
+
+<section id="sec-readiness" data-section="readiness">
+  <div class="section-head">
+    <div class="eyebrow" data-i18n="readiness_eyebrow">Readiness</div>
+    <h2 data-i18n="readiness_title">Your circle of readiness</h2>
+    <p data-i18n="readiness_desc">Four rings. One family. Track how prepared each layer is.</p>
+  </div>
+  <div class="rings-container">
+    <svg class="rings-svg reveal" viewBox="0 0 200 200" aria-label="Readiness rings">
+      <circle class="ring-track" cx="100" cy="100" r="88"></circle>
+      <circle class="ring-fill" cx="100" cy="100" r="88" data-ring="neighborhood" stroke="#7cc4ff" stroke-dasharray="553" stroke-dashoffset="553"></circle>
+      <circle class="ring-track" cx="100" cy="100" r="68"></circle>
+      <circle class="ring-fill" cx="100" cy="100" r="68" data-ring="home" stroke="#f5b759" stroke-dasharray="427" stroke-dashoffset="427"></circle>
+      <circle class="ring-track" cx="100" cy="100" r="48"></circle>
+      <circle class="ring-fill" cx="100" cy="100" r="48" data-ring="family" stroke="#f06292" stroke-dasharray="302" stroke-dashoffset="302"></circle>
+      <circle class="ring-track" cx="100" cy="100" r="28"></circle>
+      <circle class="ring-fill" cx="100" cy="100" r="28" data-ring="personal" stroke="#6ee7d3" stroke-dasharray="176" stroke-dashoffset="176"></circle>
+    </svg>
+    <div class="rings-legend reveal-stagger">
+      <div class="legend-item"><span class="legend-swatch" style="background:#6ee7d3"></span><span>Personal</span></div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#f06292"></span><span>Family</span></div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#f5b759"></span><span>Home</span></div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#7cc4ff"></span><span>Neighborhood</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="sec-plan" data-section="plan">
+  <div class="section-head">
+    <div class="eyebrow" data-i18n="plan_eyebrow">Plan</div>
+    <h2 data-i18n="plan_title">Build your emergency plan</h2>
+    <p data-i18n="plan_desc">Everything is saved locally on your device. No account. No servers.</p>
+  </div>
+  <div class="grid grid-2 reveal">
+    <div class="card">
+      <div class="field"><label for="planName" data-i18n="plan_name">Your name</label>
+        <input type="text" id="planName" placeholder="e.g. Alex"></div>
+      <div class="field"><label for="planMeeting" data-i18n="plan_meeting">Meeting point</label>
+        <input type="text" id="planMeeting" placeholder="e.g. Oak Park entrance"></div>
+      <div class="field"><label for="planContact" data-i18n="plan_contact">Emergency contact</label>
+        <input type="text" id="planContact" placeholder="Name + phone"></div>
+    </div>
+    <div class="card">
+      <div class="field"><label for="planMeds" data-i18n="plan_meds">Medications &amp; allergies</label>
+        <textarea id="planMeds" placeholder="e.g. Insulin, peanut allergy"></textarea></div>
+      <div class="field"><label for="planNeeds" data-i18n="plan_needs">Special needs</label>
+        <textarea id="planNeeds" placeholder="Accessibility, pets, language, transport"></textarea></div>
+      <button class="btn btn-primary" id="savePlanBtn" data-i18n="plan_save">Save plan</button>
+    </div>
+  </div>
+</section>
+
+<section id="sec-kit" data-section="kit">
+  <div class="section-head">
+    <div class="eyebrow" data-i18n="kit_eyebrow">Kit</div>
+    <h2 data-i18n="kit_title">Emergency kit manager</h2>
+    <p data-i18n="kit_desc">Check items, track expiries. Saved offline.</p>
+  </div>
+  <div class="kit-list reveal" id="kitList"></div>
+</section>
+
+<section id="sec-circle" data-section="circle">
+  <div class="section-head">
+    <div class="eyebrow" data-i18n="circle_eyebrow">Circle</div>
+    <h2 data-i18n="circle_title">Family Circle</h2>
+    <p data-i18n="circle_desc">A private topic connects your family's devices — even across the internet. Nothing is stored on a RALLY server.</p>
+  </div>
+  <div class="grid grid-2 reveal">
+    <div class="card">
+      <div class="warn" id="cryptoWarn" data-i18n="circle_crypto_warn">Encryption is unavailable on this address. Use https or localhost. Messages would be sent unencrypted.</div>
+      <div class="field">
+        <label for="circleTopic" data-i18n="circle_topic_label">Private topic</label>
+        <div class="input-row">
+          <input type="text" id="circleTopic" placeholder="e.g. rally-family-9x7kq2pv" spellcheck="false" autocapitalize="off">
+          <button class="btn btn-ghost" id="genTopicBtn" data-i18n="circle_generate">Generate</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="circlePass" data-i18n="circle_pass_label">Family passphrase</label>
+        <div class="input-row">
+          <input type="text" id="circlePass" placeholder="A shared secret only your family knows" spellcheck="false" autocapitalize="off">
+          <button class="btn btn-ghost" id="genPassBtn" data-i18n="circle_generate">Generate</button>
+        </div>
+      </div>
+      <p class="note" data-i18n="circle_privacy_note">Messages are encrypted on your device with AES-GCM before they leave. The relay only sees ciphertext.</p>
+      <div class="hero-cta" style="justify-content:flex-start;gap:10px">
+        <button class="btn btn-primary" id="connectBtn">Connect</button>
+        <button class="btn btn-ghost" id="copyInviteBtn" data-i18n="circle_copy_invite">Copy invite</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:16px" data-i18n="circle_members_title">Family members</h3>
+      <div id="memberList"></div>
+      <div class="field" style="margin-top:16px"><label for="memberName" data-i18n="circle_member_name">Name</label>
+        <input type="text" id="memberName" placeholder="e.g. Sam" autocomplete="off"></div>
+      <div class="field"><label for="memberPhone" data-i18n="circle_member_phone">Phone (for SMS fallback)</label>
+        <input type="tel" id="memberPhone" placeholder="+1 555 010 2030" inputmode="tel" autocomplete="off"></div>
+      <div class="hero-cta" style="justify-content:flex-start;gap:10px">
+        <button class="btn btn-primary" id="addMemberBtn" data-i18n="circle_add_member">Add member</button>
+        <button class="btn btn-ghost" id="testBtn" data-i18n="circle_test">Send test</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sec-siren" data-section="siren" class="siren-section">
+  <div class="section-head">
+    <div class="eyebrow" data-i18n="siren_eyebrow">Siren</div>
+    <h2 data-i18n="siren_title">Family Siren</h2>
+    <p data-i18n="siren_desc">Press and hold for 2 seconds to alert your circle with sound.</p>
+  </div>
+  <button class="siren-big reveal" id="sirenBig" aria-label="Family emergency siren">
+    <span class="hold-ring" aria-hidden="true"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="96"></circle></svg></span>
+    <span data-i18n="siren_press">HOLD</span>
+  </button>
+  <p class="siren-hint reveal" data-i18n="siren_hint">Your whole circle — including you — will hear the siren. Cancel within 10 seconds if this was accidental.</p>
+  <div class="siren-actions reveal-stagger">
+    <button class="siren-reason" data-reason="help" data-i18n="siren_help">Need help</button>
+    <button class="siren-reason" data-reason="medical" data-i18n="siren_medical">Medical</button>
+    <button class="siren-reason" data-reason="fire" data-i18n="siren_fire">Fire</button>
+    <button class="siren-reason" data-reason="flood" data-i18n="siren_flood">Flood</button>
+    <button class="siren-reason" data-reason="unsafe" data-i18n="siren_unsafe">Unsafe location</button>
+  </div>
+</section>
+
+<section id="sec-drills" data-section="drills">
+  <div class="section-head">
+    <div class="eyebrow" data-i18n="drill_eyebrow">Practice</div>
+    <h2 data-i18n="drill_title">Drill mode</h2>
+    <p data-i18n="drill_desc">Timed family drills with after-action review.</p>
+  </div>
+  <div class="card reveal" style="text-align:center;max-width:520px;margin:0 auto">
+    <div class="drill-timer" id="drillTimer">00:00</div>
+    <div class="hero-cta">
+      <button class="btn btn-primary" id="drillStart" data-i18n="drill_start">Start drill</button>
+      <button class="btn btn-ghost" id="drillReset" data-i18n="drill_reset">Reset</button>
+    </div>
+  </div>
+</section>
+
+<section id="sec-shelters" data-section="shelters">
+  <div class="section-head">
+    <div class="eyebrow" data-i18n="shelters_eyebrow">Nearby</div>
+    <h2 data-i18n="shelters_title">Shelters &amp; safe routes</h2>
+    <p data-i18n="shelters_desc">Cached offline. Add your own shelters. Filter by accessibility and pets.</p>
+  </div>
+  <div class="card reveal" style="margin-bottom:24px">
+    <h3 style="margin-bottom:16px" data-i18n="shelter_add_title">Add a shelter</h3>
+    <div class="grid grid-2" style="gap:16px">
+      <div class="field"><label for="shelterName" data-i18n="shelter_name_label">Shelter name</label>
+        <input type="text" id="shelterName" placeholder="e.g. Community Center"></div>
+      <div class="field"><label for="shelterDist" data-i18n="shelter_dist_label">Distance</label>
+        <input type="text" id="shelterDist" placeholder="e.g. 1.5 km"></div>
+    </div>
+    <div class="checkbox-row">
+      <label><input type="checkbox" id="shelterAccessible"><span data-i18n="shelter_accessible">♿ Accessible</span></label>
+      <label><input type="checkbox" id="shelterPets"><span data-i18n="shelter_pets">🐾 Pets allowed</span></label>
+    </div>
+    <button class="btn btn-primary" id="addShelterBtn" data-i18n="shelter_add_btn">Add shelter</button>
+  </div>
+  <div class="grid grid-3 reveal-stagger" id="shelterList"></div>
+</section>
+
+<section id="sec-hub" data-section="hub">
+  <div class="section-head">
+    <div class="eyebrow" data-i18n="hub_eyebrow">Community</div>
+    <h2 data-i18n="hub_title">Neighborhood hub</h2>
+    <p data-i18n="hub_desc">Privacy-first. Optional. You decide what to share.</p>
+  </div>
+  <div class="reveal">
+    <div class="hub-post">
+      <div class="hub-post-head">
+        <span class="hub-post-author" data-i18n="hub_post_1_author">Maya · 2 blocks away</span>
+        <span class="hub-post-time" data-i18n="hub_post_1_time">5 min ago</span>
+      </div>
+      <p data-i18n="hub_post_1_body">Water bottles available at the corner store. Free for neighbors.</p>
+    </div>
+    <div class="hub-post">
+      <div class="hub-post-head">
+        <span class="hub-post-author" data-i18n="hub_post_2_author">Daniel · nearby</span>
+        <span class="hub-post-time" data-i18n="hub_post_2_time">20 min ago</span>
+      </div>
+      <p data-i18n="hub_post_2_body">Does anyone have a spare phone charger? Mine stopped working.</p>
+    </div>
+    <button class="btn btn-ghost" style="margin-top:8px" data-i18n="hub_post_btn">Post an update (opt-in)</button>
+  </div>
+</section>
+
+<section id="sec-card" data-section="card">
+  <div class="section-head">
+    <div class="eyebrow" data-i18n="card_eyebrow">Card</div>
+    <h2 data-i18n="card_title">Emergency wallet card</h2>
+    <p data-i18n="card_desc">Printable. Multi-language. QR-linked to your plan.</p>
+  </div>
+  <div class="emergency-card reveal">
+    <div>
+      <div style="font-size:1.1rem;font-weight:700;margin-bottom:4px" id="cardName">—</div>
+      <div style="color:var(--text-dim);font-size:.85rem;margin-bottom:12px" id="cardContact">—</div>
+      <div style="font-size:.8rem;color:var(--text-dim);margin-bottom:12px" id="cardMeeting">—</div>
+      <button class="btn btn-primary" id="printCardBtn" data-i18n="card_print">Print card</button>
+    </div>
+    <div class="qr-placeholder">SCAN FOR PLAN</div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p><strong>RALLY</strong> — <span data-i18n="hero_tagline">Where every circle finds its center.</span></p>
+</footer>
+
+<div class="siren-overlay" id="sirenOverlay" role="alertdialog" aria-modal="true" aria-labelledby="sirenOverlayTitle">
+  <div class="siren-overlay-box">
+    <span class="siren-icon" aria-hidden="true">🚨</span>
+    <h2 id="sirenOverlayTitle" data-i18n="siren_alert_title">SIREN</h2>
+    <div class="siren-from" id="sirenFrom"></div>
+    <div class="siren-reason-text" id="sirenOverlayReason">Need help</div>
+    <div class="siren-countdown"><span data-i18n="siren_auto_cancel">Auto-cancel in</span> <strong id="sirenCount">10</strong>s</div>
+    <div class="siren-btns">
+      <button class="btn btn-ghost" id="sirenCancelBtn" data-i18n="siren_cancel_btn">Cancel alert</button>
+      <button class="btn btn-primary" id="sirenAckBtn" data-i18n="siren_ack_btn">Acknowledge</button>
+    </div>
+    <div class="sms-panel" id="smsPanel">
+      <h4 data-i18n="siren_sms_title">Send by SMS</h4>
+      <p data-i18n="siren_sms_note">No internet right now. Use your phone's SMS to reach your circle.</p>
+      <div id="smsLinks"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   RALLY
+   ============================================================ */
+
+const i18n = {
+  en:{
+    hero_badge:"Free · Private · Offline-ready",hero_title:"RALLY",hero_tagline:"Where every circle finds its center.",
+    cta_start:"Start your plan",cta_siren:"Set up Siren",
+    readiness_eyebrow:"Readiness",readiness_title:"Your circle of readiness",readiness_desc:"Four rings. One family. Track how prepared each layer is.",
+    plan_eyebrow:"Plan",plan_title:"Build your emergency plan",plan_desc:"Everything is saved locally on your device. No account. No servers.",
+    plan_name:"Your name",plan_meeting:"Meeting point",plan_contact:"Emergency contact",
+    plan_meds:"Medications & allergies",plan_needs:"Special needs",plan_save:"Save plan",
+    kit_eyebrow:"Kit",kit_title:"Emergency kit manager",kit_desc:"Check items, track expiries. Saved offline.",
+    circle_eyebrow:"Circle",circle_title:"Family Circle",
+    circle_desc:"A private topic connects your family's devices — even across the internet. Nothing is stored on a RALLY server.",
+    circle_topic_label:"Private topic",circle_pass_label:"Family passphrase",circle_generate:"Generate",
+    circle_copy_invite:"Copy invite",circle_connect:"Connect",circle_disconnect:"Disconnect",
+    circle_members_title:"Family members",circle_member_name:"Name",circle_member_phone:"Phone (for SMS fallback)",
+    circle_add_member:"Add member",circle_no_members:"No members yet. Add at least one phone number for SMS fallback.",
+    circle_test:"Send test",circle_remove:"Remove",
+    circle_status_online:"Connected",circle_status_offline:"Offline",circle_status_connecting:"Connecting…",circle_status_unconfigured:"Not set up",
+    circle_invite_copied:"Invite copied",circle_need_topic:"Enter a private topic first",circle_need_pass:"Enter a family passphrase first",
+    circle_saved:"Saved",circle_privacy_note:"Messages are encrypted on your device with AES-GCM before they leave. The relay only sees ciphertext.",
+    circle_crypto_warn:"Encryption is unavailable on this address. Use https or localhost. Messages would be sent unencrypted.",
+    siren_eyebrow:"Siren",siren_title:"Family Siren",siren_desc:"Press and hold for 2 seconds to alert your circle with sound.",
+    siren_press:"HOLD",siren_hint:"Your whole circle — including you — will hear the siren. Cancel within 10 seconds if this was accidental.",
+    siren_help:"Need help",siren_medical:"Medical",siren_fire:"Fire",siren_flood:"Flood",siren_unsafe:"Unsafe location",
+    siren_alert_title:"SIREN",siren_auto_cancel:"Auto-cancel in",siren_cancel_btn:"Cancel alert",siren_ack_btn:"Acknowledge",
+    siren_sms_title:"Send by SMS",siren_sms_note:"No internet right now. Use your phone's SMS to reach your circle.",
+    siren_send_sms:"Open SMS",siren_no_members:"Add phone numbers in Family Circle to enable SMS fallback.",siren_from:"From",
+    drill_eyebrow:"Practice",drill_title:"Drill mode",drill_desc:"Timed family drills with after-action review.",
+    drill_start:"Start drill",drill_reset:"Reset",
+    shelters_eyebrow:"Nearby",shelters_title:"Shelters & safe routes",shelters_desc:"Cached offline. Add your own shelters. Filter by accessibility and pets.",
+    shelter_add_title:"Add a shelter",shelter_name_label:"Shelter name",shelter_dist_label:"Distance",
+    shelter_accessible:"♿ Accessible",shelter_pets:"🐾 Pets allowed",shelter_add_btn:"Add shelter",
+    shelter_route:"View route",shelter_delete:"Delete",
+    hub_eyebrow:"Community",hub_title:"Neighborhood hub",hub_desc:"Privacy-first. Optional. You decide what to share.",
+    hub_post_1_author:"Maya · 2 blocks away",hub_post_1_time:"5 min ago",hub_post_1_body:"Water bottles available at the corner store. Free for neighbors.",
+    hub_post_2_author:"Daniel · nearby",hub_post_2_time:"20 min ago",hub_post_2_body:"Does anyone have a spare phone charger? Mine stopped working.",
+    hub_post_btn:"Post an update (opt-in)",
+    card_eyebrow:"Card",card_title:"Emergency wallet card",card_desc:"Printable. Multi-language. QR-linked to your plan.",card_print:"Print card",
+    pwa_install:"Install",pwa_installed:"RALLY installed"
+  },
+  es:{
+    hero_badge:"Gratis · Privado · Sin conexión",hero_title:"RALLY",hero_tagline:"Donde cada círculo encuentra su centro.",
+    cta_start:"Crear mi plan",cta_siren:"Configurar Sirena",
+    readiness_eyebrow:"Preparación",readiness_title:"Tu círculo de preparación",readiness_desc:"Cuatro anillos. Una familia. Sigue la preparación de cada capa.",
+    plan_eyebrow:"Plan",plan_title:"Crea tu plan de emergencia",plan_desc:"Todo se guarda localmente en tu dispositivo. Sin cuenta. Sin servidores.",
+    plan_name:"Tu nombre",plan_meeting:"Punto de encuentro",plan_contact:"Contacto de emergencia",
+    plan_meds:"Medicamentos y alergias",plan_needs:"Necesidades especiales",plan_save:"Guardar plan",
+    kit_eyebrow:"Kit",kit_title:"Gestor de kit de emergencia",kit_desc:"Marca artículos, rastrea vencimientos. Guardado sin conexión.",
+    circle_eyebrow:"Círculo",circle_title:"Círculo familiar",
+    circle_desc:"Un tema privado conecta los dispositivos de tu familia, incluso por internet. Nada se guarda en un servidor de RALLY.",
+    circle_topic_label:"Tema privado",circle_pass_label:"Frase secreta familiar",circle_generate:"Generar",
+    circle_copy_invite:"Copiar invitación",circle_connect:"Conectar",circle_disconnect:"Desconectar",
+    circle_members_title:"Miembros",circle_member_name:"Nombre",circle_member_phone:"Teléfono (SMS)",
+    circle_add_member:"Añadir",circle_no_members:"Aún no hay miembros. Añade al menos un teléfono.",
+    circle_test:"Enviar prueba",circle_remove:"Quitar",
+    circle_status_online:"Conectado",circle_status_offline:"Sin conexión",circle_status_connecting:"Conectando…",circle_status_unconfigured:"Sin configurar",
+    circle_invite_copied:"Invitación copiada",circle_need_topic:"Primero un tema",circle_need_pass:"Primero una frase",
+    circle_saved:"Guardado",circle_privacy_note:"Los mensajes se cifran en tu dispositivo con AES-GCM antes de salir.",
+    circle_crypto_warn:"Cifrado no disponible. Usa https o localhost.",
+    siren_eyebrow:"Sirena",siren_title:"Sirena Familiar",siren_desc:"Mantén presionado 2 segundos para alertar con sonido.",
+    siren_press:"MANTÉN",siren_hint:"Todo el círculo — incluyéndote — escuchará la sirena. Cancela en 10 segundos.",
+    siren_help:"Ayuda",siren_medical:"Médico",siren_fire:"Incendio",siren_flood:"Inundación",siren_unsafe:"Ubicación insegura",
+    siren_alert_title:"SIRENA",siren_auto_cancel:"Auto-cancelar en",siren_cancel_btn:"Cancelar alerta",siren_ack_btn:"Confirmar",
+    siren_sms_title:"Enviar por SMS",siren_sms_note:"Sin internet. Usa SMS para avisar a tu círculo.",
+    siren_send_sms:"Abrir SMS",siren_no_members:"Añade teléfonos en Círculo familiar.",siren_from:"De",
+    drill_eyebrow:"Práctica",drill_title:"Simulacro",drill_desc:"Simulacros cronometrados.",
+    drill_start:"Iniciar",drill_reset:"Reiniciar",
+    shelters_eyebrow:"Cercano",shelters_title:"Refugios",shelters_desc:"Sin conexión. Agrega tus refugios.",
+    shelter_add_title:"Agregar refugio",shelter_name_label:"Nombre",shelter_dist_label:"Distancia",
+    shelter_accessible:"♿ Accesible",shelter_pets:"🐾 Mascotas",shelter_add_btn:"Agregar",
+    shelter_route:"Ver ruta",shelter_delete:"Eliminar",
+    hub_eyebrow:"Comunidad",hub_title:"Centro del vecindario",hub_desc:"Privacidad primero. Opcional.",
+    hub_post_1_author:"Maya · a 2 cuadras",hub_post_1_time:"hace 5 min",hub_post_1_body:"Botellas de agua en la tienda.",
+    hub_post_2_author:"Daniel · cerca",hub_post_2_time:"hace 20 min",hub_post_2_body:"¿Alguien tiene cargador extra?",
+    hub_post_btn:"Publicar (opcional)",
+    card_eyebrow:"Tarjeta",card_title:"Tarjeta de emergencia",card_desc:"Imprimible. Multi-idioma.",card_print:"Imprimir",
+    pwa_install:"Instalar",pwa_installed:"RALLY instalado"
+  },
+  zh:{
+    hero_badge:"免费 · 私密 · 离线可用",hero_title:"RALLY",hero_tagline:"让每个圆圈都找到中心。",
+    cta_start:"开始制定计划",cta_siren:"设置警报",
+    readiness_eyebrow:"准备度",readiness_title:"您的准备圆圈",readiness_desc:"四个圆环。一个家庭。",
+    plan_eyebrow:"计划",plan_title:"制定应急计划",plan_desc:"保存在本地设备。无需账户。",
+    plan_name:"姓名",plan_meeting:"集合地点",plan_contact:"紧急联系人",
+    plan_meds:"药物与过敏",plan_needs:"特殊需求",plan_save:"保存",
+    kit_eyebrow:"装备",kit_title:"应急装备",kit_desc:"离线保存。",
+    circle_eyebrow:"圈子",circle_title:"家庭圈",
+    circle_desc:"私密主题连接家人的设备，即使隔着互联网。",
+    circle_topic_label:"私密主题",circle_pass_label:"家庭口令",circle_generate:"生成",
+    circle_copy_invite:"复制邀请",circle_connect:"连接",circle_disconnect:"断开",
+    circle_members_title:"家庭成员",circle_member_name:"姓名",circle_member_phone:"电话（短信）",
+    circle_add_member:"添加",circle_no_members:"还没有成员。至少添加一个电话。",
+    circle_test:"发送测试",circle_remove:"移除",
+    circle_status_online:"已连接",circle_status_offline:"离线",circle_status_connecting:"连接中…",circle_status_unconfigured:"未设置",
+    circle_invite_copied:"邀请已复制",circle_need_topic:"请输入主题",circle_need_pass:"请输入口令",
+    circle_saved:"已保存",circle_privacy_note:"消息在离开设备前用 AES-GCM 加密。",
+    circle_crypto_warn:"此地址不支持加密。请使用 https 或 localhost。",
+    siren_eyebrow:"警报",siren_title:"家庭警报",siren_desc:"长按2秒通知圈子并发出声音。",
+    siren_press:"长按",siren_hint:"整个圈子都会听到警报声。误按请10秒内取消。",
+    siren_help:"需要帮助",siren_medical:"医疗",siren_fire:"火灾",siren_flood:"洪水",siren_unsafe:"不安全位置",
+    siren_alert_title:"警报",siren_auto_cancel:"自动取消倒计时",siren_cancel_btn:"取消警报",siren_ack_btn:"确认",
+    siren_sms_title:"通过短信发送",siren_sms_note:"当前无网络。请用短信联系圈子。",
+    siren_send_sms:"打开短信",siren_no_members:"在家庭圈中添加电话以启用短信备用。",siren_from:"来自",
+    drill_eyebrow:"演练",drill_title:"演练模式",drill_desc:"定时演练。",
+    drill_start:"开始",drill_reset:"重置",
+    shelters_eyebrow:"附近",shelters_title:"避难所",shelters_desc:"离线缓存。添加自己的避难所。",
+    shelter_add_title:"添加避难所",shelter_name_label:"名称",shelter_dist_label:"距离",
+    shelter_accessible:"♿ 无障碍",shelter_pets:"🐾 允许宠物",shelter_add_btn:"添加",
+    shelter_route:"查看路线",shelter_delete:"删除",
+    hub_eyebrow:"社区",hub_title:"社区中心",hub_desc:"隐私优先。可选。",
+    hub_post_1_author:"玛雅 · 隔两条街",hub_post_1_time:"5分钟前",hub_post_1_body:"街角商店有瓶装水。",
+    hub_post_2_author:"丹尼尔 · 附近",hub_post_2_time:"20分钟前",hub_post_2_body:"有人有多余的充电器吗？",
+    hub_post_btn:"发布（可选）",
+    card_eyebrow:"卡片",card_title:"应急卡",card_desc:"可打印。多语言。",card_print:"打印",
+    pwa_install:"安装",pwa_installed:"RALLY 已安装"
+  },
+  hi:{
+    hero_badge:"मुफ़्त · निजी · ऑफ़लाइन",hero_title:"RALLY",hero_tagline:"जहाँ हर वृत्त अपना केंद्र पाता है।",
+    cta_start:"योजना बनाएं",cta_siren:"सायरन सेट करें",
+    readiness_eyebrow:"तैयारी",readiness_title:"तैयारी वृत्त",readiness_desc:"चार वृत्त। एक परिवार।",
+    plan_eyebrow:"योजना",plan_title:"आपातकालीन योजना",plan_desc:"डिवाइस पर स्थानीय। कोई खाता नहीं।",
+    plan_name:"नाम",plan_meeting:"मिलने का स्थान",plan_contact:"आपातकालीन संपर्क",
+    plan_meds:"दवाएं और एलर्जी",plan_needs:"विशेष आवश्यकताएं",plan_save:"सहेजें",
+    kit_eyebrow:"किट",kit_title:"आपातकालीन किट",kit_desc:"ऑफ़लाइन सहेजा।",
+    circle_eyebrow:"वृत्त",circle_title:"पारिवारिक वृत्त",
+    circle_desc:"निजी टॉपिक परिवार के डिवाइस को इंटरनेट पर जोड़ता है।",
+    circle_topic_label:"निजी टॉपिक",circle_pass_label:"पारिवारिक पासफ़्रेज़",circle_generate:"बनाएं",
+    circle_copy_invite:"आमंत्रण कॉपी करें",circle_connect:"कनेक्ट",circle_disconnect:"डिस्कनेक्ट",
+    circle_members_title:"सदस्य",circle_member_name:"नाम",circle_member_phone:"फ़ोन (SMS)",
+    circle_add_member:"जोड़ें",circle_no_members:"अभी कोई सदस्य नहीं। कम से कम एक फ़ोन जोड़ें।",
+    circle_test:"परीक्षण",circle_remove:"हटाएं",
+    circle_status_online:"जुड़ा",circle_status_offline:"ऑफ़लाइन",circle_status_connecting:"जुड़ रहा…",circle_status_unconfigured:"सेट नहीं",
+    circle_invite_copied:"कॉपी हुआ",circle_need_topic:"पहले टॉपिक",circle_need_pass:"पहले पासफ़्रेज़",
+    circle_saved:"सहेजा",circle_privacy_note:"संदेश डिवाइस पर AES-GCM से एन्क्रिप्ट होते हैं।",
+    circle_crypto_warn:"एन्क्रिप्शन उपलब्ध नहीं। https या localhost उपयोग करें।",
+    siren_eyebrow:"सायरन",siren_title:"पारिवारिक सायरन",siren_desc:"ध्वनि के साथ वृत्त को सचेत करने के लिए 2 सेकंड दबाएं।",
+    siren_press:"दबाए रखें",siren_hint:"पूरा वृत्त सायरन सुनेगा। गलती हो तो 10 सेकंड में रद्द करें।",
+    siren_help:"मदद चाहिए",siren_medical:"चिकित्सा",siren_fire:"आग",siren_flood:"बाढ़",siren_unsafe:"असुरक्षित",
+    siren_alert_title:"सायरन",siren_auto_cancel:"स्वतः रद्द में",siren_cancel_btn:"रद्द करें",siren_ack_btn:"स्वीकार",
+    siren_sms_title:"SMS से भेजें",siren_sms_note:"इंटरनेट नहीं। SMS से वृत्त तक पहुँचें।",
+    siren_send_sms:"SMS खोलें",siren_no_members:"SMS के लिए फ़ोन जोड़ें।",siren_from:"से",
+    drill_eyebrow:"अभ्यास",drill_title:"अभ्यास",drill_desc:"समयबद्ध अभ्यास।",
+    drill_start:"शुरू",drill_reset:"रीसेट",
+    shelters_eyebrow:"आस-पास",shelters_title:"आश्रय",shelters_desc:"ऑफ़लाइन। अपने आश्रय जोड़ें।",
+    shelter_add_title:"आश्रय जोड़ें",shelter_name_label:"नाम",shelter_dist_label:"दूरी",
+    shelter_accessible:"♿ सुलभ",shelter_pets:"🐾 पालतू",shelter_add_btn:"जोड़ें",
+    shelter_route:"मार्ग",shelter_delete:"हटाएं",
+    hub_eyebrow:"समुदाय",hub_title:"पड़ोस केंद्र",hub_desc:"गोपनीयता पहले। वैकल्पिक।",
+    hub_post_1_author:"माया · 2 ब्लॉक",hub_post_1_time:"5 मिनट पहले",hub_post_1_body:"कोने की दुकान पर पानी।",
+    hub_post_2_author:"डैनियल · पास",hub_post_2_time:"20 मिनट पहले",hub_post_2_body:"किसी के पास अतिरिक्त चार्जर?",
+    hub_post_btn:"पोस्ट करें (वैकल्पिक)",
+    card_eyebrow:"कार्ड",card_title:"आपातकालीन कार्ड",card_desc:"प्रिंट करने योग्य।",card_print:"प्रिंट",
+    pwa_install:"इंस्टॉल",pwa_installed:"RALLY इंस्टॉल हुआ"
+  },
+  ar:{
+    hero_badge:"مجاني · خاص · يعمل دون اتصال",hero_title:"RALLY",hero_tagline:"حيث تجد كل دائرة مركزها.",
+    cta_start:"ابدأ خطتك",cta_siren:"إعداد الصفارة",
+    readiness_eyebrow:"الجاهزية",readiness_title:"دائرة جاهزيتك",readiness_desc:"أربع دوائر. عائلة واحدة.",
+    plan_eyebrow:"الخطة",plan_title:"خطة الطوارئ",plan_desc:"محفوظة محليًا. بلا حساب.",
+    plan_name:"اسمك",plan_meeting:"نقطة التجمع",plan_contact:"جهة اتصال",
+    plan_meds:"الأدوية والحساسية",plan_needs:"احتياجات خاصة",plan_save:"احفظ",
+    kit_eyebrow:"العدة",kit_title:"عدة الطوارئ",kit_desc:"محفوظة دون اتصال.",
+    circle_eyebrow:"الدائرة",circle_title:"دائرة العائلة",
+    circle_desc:"موضوع خاص يربط أجهزة عائلتك عبر الإنترنت.",
+    circle_topic_label:"الموضوع الخاص",circle_pass_label:"عبارة سر العائلة",circle_generate:"إنشاء",
+    circle_copy_invite:"نسخ الدعوة",circle_connect:"اتصال",circle_disconnect:"قطع",
+    circle_members_title:"أفراد العائلة",circle_member_name:"الاسم",circle_member_phone:"الهاتف (SMS)",
+    circle_add_member:"إضافة",circle_no_members:"لا يوجد أفراد بعد. أضف رقم هاتف.",
+    circle_test:"إرسال اختبار",circle_remove:"إزالة",
+    circle_status_online:"متصل",circle_status_offline:"غير متصل",circle_status_connecting:"جارٍ الاتصال…",circle_status_unconfigured:"غير مُعد",
+    circle_invite_copied:"تم النسخ",circle_need_topic:"أدخل موضوعًا",circle_need_pass:"أدخل عبارة سر",
+    circle_saved:"تم الحفظ",circle_privacy_note:"تُشفَّر الرسائل باستخدام AES-GCM قبل الإرسال.",
+    circle_crypto_warn:"التشفير غير متاح. استخدم https أو localhost.",
+    siren_eyebrow:"الصفارة",siren_title:"صفارة العائلة",siren_desc:"اضغط ثانيتين لتنبيه دائرتك بالصوت.",
+    siren_press:"استمر بالضغط",siren_hint:"ستسمع دائرتك الصفارة. ألغِ خلال 10 ثوانٍ إن كان خطأ.",
+    siren_help:"أحتاج مساعدة",siren_medical:"طبي",siren_fire:"حريق",siren_flood:"فيضان",siren_unsafe:"غير آمن",
+    siren_alert_title:"صفارة",siren_auto_cancel:"إلغاء تلقائي خلال",siren_cancel_btn:"إلغاء",siren_ack_btn:"تأكيد",
+    siren_sms_title:"إرسال برسالة نصية",siren_sms_note:"لا إنترنت الآن. استخدم الرسائل النصية.",
+    siren_send_sms:"فتح الرسائل",siren_no_members:"أضف أرقام هاتف في دائرة العائلة.",siren_from:"من",
+    drill_eyebrow:"التدريب",drill_title:"وضع التدريب",drill_desc:"تدريبات موقوتة.",
+    drill_start:"ابدأ",drill_reset:"إعادة",
+    shelters_eyebrow:"قريب",shelters_title:"الملاجئ",shelters_desc:"مخزّن دون اتصال. أضف ملاجئك.",
+    shelter_add_title:"أضف ملجأ",shelter_name_label:"الاسم",shelter_dist_label:"المسافة",
+    shelter_accessible:"♿ متاح",shelter_pets:"🐾 حيوانات",shelter_add_btn:"أضف",
+    shelter_route:"عرض الطريق",shelter_delete:"حذف",
+    hub_eyebrow:"المجتمع",hub_title:"مركز الحي",hub_desc:"الخصوصية أولًا. اختياري.",
+    hub_post_1_author:"مايا · مبنيان",hub_post_1_time:"قبل 5 د",hub_post_1_body:"زجاجات مياه في متجر الزاوية.",
+    hub_post_2_author:"دانيال · قريب",hub_post_2_time:"قبل 20 د",hub_post_2_body:"هل لدى أحد شاحن إضافي؟",
+    hub_post_btn:"انشر (اختياري)",
+    card_eyebrow:"بطاقة",card_title:"بطاقة الطوارئ",card_desc:"قابلة للطباعة.",card_print:"اطبع",
+    pwa_install:"تثبيت",pwa_installed:"تم تثبيت RALLY"
+  },
+  fa:{
+    hero_badge:"رایگان · خصوصی · آماده آفلاین",hero_title:"RALLY",hero_tagline:"جایی که هر حلقه مرکز خود را می‌یابد.",
+    cta_start:"طرح خود را بسازید",cta_siren:"تنظیم آژیر",
+    readiness_eyebrow:"آمادگی",readiness_title:"حلقه آمادگی شما",readiness_desc:"چهار حلقه. یک خانواده.",
+    plan_eyebrow:"طرح",plan_title:"طرح اضطراری",plan_desc:"ذخیره محلی. بدون حساب.",
+    plan_name:"نام شما",plan_meeting:"نقطه ملاقات",plan_contact:"تماس اضطراری",
+    plan_meds:"داروها و حساسیت‌ها",plan_needs:"نیازهای ویژه",plan_save:"ذخیره",
+    kit_eyebrow:"کیف",kit_title:"کیف اضطراری",kit_desc:"ذخیره آفلاین.",
+    circle_eyebrow:"حلقه",circle_title:"حلقه خانواده",
+    circle_desc:"موضوع خصوصی دستگاه‌های خانواده را حتی روی اینترنت به هم وصل می‌کند.",
+    circle_topic_label:"موضوع خصوصی",circle_pass_label:"عبارت عبور خانوادگی",circle_generate:"ساخت",
+    circle_copy_invite:"کپی دعوت",circle_connect:"اتصال",circle_disconnect:"قطع",
+    circle_members_title:"اعضا",circle_member_name:"نام",circle_member_phone:"تلفن (پیامک)",
+    circle_add_member:"افزودن",circle_no_members:"هنوز عضوی نیست. حداقل یک شماره اضافه کنید.",
+    circle_test:"ارسال آزمایشی",circle_remove:"حذف",
+    circle_status_online:"متصل",circle_status_offline:"آفلاین",circle_status_connecting:"در حال اتصال…",circle_status_unconfigured:"تنظیم نشده",
+    circle_invite_copied:"کپی شد",circle_need_topic:"ابتدا موضوع",circle_need_pass:"ابتدا عبارت عبور",
+    circle_saved:"ذخیره شد",circle_privacy_note:"پیام‌ها با AES-GCM رمزنگاری می‌شوند.",
+    circle_crypto_warn:"رمزنگاری در دسترس نیست. از https یا localhost استفاده کنید.",
+    siren_eyebrow:"آژیر",siren_title:"آژیر خانواده",siren_desc:"۲ ثانیه نگه دارید تا با صدا آگاه شوند.",
+    siren_press:"نگه دارید",siren_hint:"کل حلقه آژیر را می‌شنود. اشتباه بود ظرف ۱۰ ثانیه لغو کنید.",
+    siren_help:"کمک لازم دارم",siren_medical:"پزشکی",siren_fire:"آتش‌سوزی",siren_flood:"سیل",siren_unsafe:"مکان ناامن",
+    siren_alert_title:"آژیر",siren_auto_cancel:"لغو خودکار در",siren_cancel_btn:"لغو",siren_ack_btn:"تأیید",
+    siren_sms_title:"ارسال با پیامک",siren_sms_note:"اینترنت نیست. از پیامک استفاده کنید.",
+    siren_send_sms:"باز کردن پیامک",siren_no_members:"شماره‌ها را در حلقه خانواده اضافه کنید.",siren_from:"از طرف",
+    drill_eyebrow:"تمرین",drill_title:"تمرین",drill_desc:"تمرین زمان‌دار.",
+    drill_start:"شروع",drill_reset:"بازنشانی",
+    shelters_eyebrow:"نزدیک",shelters_title:"پناهگاه‌ها",shelters_desc:"ذخیره آفلاین. پناهگاه اضافه کنید.",
+    shelter_add_title:"افزودن پناهگاه",shelter_name_label:"نام",shelter_dist_label:"فاصله",
+    shelter_accessible:"♿ دسترسی",shelter_pets:"🐾 حیوانات",shelter_add_btn:"افزودن",
+    shelter_route:"مسیر",shelter_delete:"حذف",
+    hub_eyebrow:"جامعه",hub_title:"مرکز محله",hub_desc:"حریم خصوصی اول. اختیاری.",
+    hub_post_1_author:"مایا · دو کوچه",hub_post_1_time:"۵ دقیقه پیش",hub_post_1_body:"بطری آب در فروشگاه.",
+    hub_post_2_author:"دنیل · نزدیک",hub_post_2_time:"۲۰ دقیقه پیش",hub_post_2_body:"کسی شارژر اضافه دارد؟",
+    hub_post_btn:"ارسال (اختیاری)",
+    card_eyebrow:"کارت",card_title:"کارت اضطراری",card_desc:"قابل چاپ.",card_print:"چاپ",
+    pwa_install:"نصب",pwa_installed:"RALLY نصب شد"
+  }
+};
+
+let currentLang = 'en';
+const rtlLangs = ['ar','fa'];
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const NTFY_BASE = 'https://ntfy.sh';
+const HAS_SUBTLE = !!(window.crypto && window.crypto.subtle && window.crypto.subtle.importKey);
+
+let circleState = 'unconfigured';
+let circleES = null;
+let esRetry = null;
+const seenMsgIds = new Set();
+let currentSirenId = null;
+let sirenCountdownTimer = null;
+let sirenRole = 'sender';
+
+function t(key) {
+  const d = i18n[currentLang] || i18n.en;
+  return d[key] || (i18n.en[key] || key);
+}
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 3400);
+}
+function b64url(bytes) {
+  let s = '';
+  for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+  return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function fromB64url(str) {
+  str = str.replace(/-/g,'+').replace(/_/g,'/');
+  while (str.length % 4) str += '=';
+  const bin = atob(str);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+function deviceId() {
+  let id = null;
+  try { id = localStorage.getItem('rally_device_id'); } catch(_) {}
+  if (!id) {
+    id = b64url(crypto.getRandomValues(new Uint8Array(8)));
+    try { localStorage.setItem('rally_device_id', id); } catch(_) {}
+  }
+  return id;
+}
+function sanitizeTopic(s) {
+  return String(s || '').trim().toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 64);
+}
+
+function applyLang(lang) {
+  currentLang = lang;
+  const dict = i18n[lang] || i18n.en;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = rtlLangs.includes(lang) ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key]) el.textContent = dict[key];
+  });
+  try { localStorage.setItem('rally_lang', lang); } catch(_) {}
+  updateReadinessLegend();
+  renderShelters();
+  renderMembers();
+  setStatus(circleState);
+  const ib = document.getElementById('installBtn');
+  if (ib && !ib.hidden) ib.textContent = t('pwa_install');
+  updatePwaManifest();
+}
+
+/* ---------------- Particles ---------------- */
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+const dpr = window.devicePixelRatio || 1;
+function resizeCanvas() {
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  canvas.style.width = window.innerWidth + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  initParticles();
+}
+function initParticles() {
+  const count = Math.min(50, Math.max(12, Math.floor(window.innerWidth / 30)));
+  particles = [];
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight,
+      r: Math.random() * 2 + 0.5,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3 - 0.15,
+      a: Math.random() * 0.4 + 0.1
+    });
+  }
+}
+function animateParticles() {
+  ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+  for (const p of particles) {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = window.innerWidth;
+    if (p.x > window.innerWidth) p.x = 0;
+    if (p.y < 0) p.y = window.innerHeight;
+    if (p.y > window.innerHeight) p.y = 0;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(110,231,211,' + p.a + ')';
+    ctx.fill();
+  }
+  requestAnimationFrame(animateParticles);
+}
+if (!reduceMotion) { resizeCanvas(); window.addEventListener('resize', resizeCanvas); animateParticles(); }
+
+/* ---------------- Progress rail ---------------- */
+const sections = document.querySelectorAll('section[data-section]');
+const rail = document.getElementById('progressRail');
+sections.forEach((sec, i) => {
+  const dot = document.createElement('button');
+  dot.className = 'dot';
+  dot.setAttribute('aria-label', 'Go to section ' + (i + 1));
+  dot.addEventListener('click', () => sec.scrollIntoView({behavior: 'smooth'}));
+  rail.appendChild(dot);
+});
+function updateRail() {
+  const dots = rail.querySelectorAll('.dot');
+  let activeIdx = 0;
+  sections.forEach((sec, i) => {
+    if (sec.getBoundingClientRect().top <= window.innerHeight * 0.5) activeIdx = i;
+  });
+  dots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
+}
+let ticking = false;
+window.addEventListener('scroll', () => {
+  if (!ticking) { requestAnimationFrame(() => { updateRail(); ticking = false; }); ticking = true; }
+}, {passive: true});
+
+/* ---------------- Reveal ---------------- */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+}, {threshold: 0.15});
+document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => io.observe(el));
+
+/* ---------------- Plan ---------------- */
+function getPlan() { try { return JSON.parse(localStorage.getItem('rally_plan') || '{}'); } catch { return {}; } }
+function loadPlan() {
+  const p = getPlan();
+  const map = {name:'planName', meeting:'planMeeting', contact:'planContact', meds:'planMeds', needs:'planNeeds'};
+  Object.keys(map).forEach(k => {
+    const el = document.getElementById(map[k]);
+    if (el && p[k]) el.value = p[k];
+  });
+  updateCard(p);
+}
+function updateCard(p) {
+  document.getElementById('cardName').textContent = p.name || '—';
+  document.getElementById('cardContact').textContent = p.contact || '—';
+  document.getElementById('cardMeeting').textContent = p.meeting ? '📍 ' + p.meeting : '—';
+}
+document.getElementById('savePlanBtn').addEventListener('click', () => {
+  const plan = {
+    name: document.getElementById('planName').value.trim(),
+    meeting: document.getElementById('planMeeting').value.trim(),
+    contact: document.getElementById('planContact').value.trim(),
+    meds: document.getElementById('planMeds').value.trim(),
+    needs: document.getElementById('planNeeds').value.trim()
+  };
+  try { localStorage.setItem('rally_plan', JSON.stringify(plan)); } catch(_) {}
+  updateCard(plan); computeReadiness(); toast('✓ ' + t('plan_save'));
+});
+
+/* ---------------- Kit ---------------- */
+const defaultKit = [
+  {id:'water', label:'Water (3 days)'},{id:'food', label:'Non-perishable food'},
+  {id:'radio', label:'Battery / hand-crank radio'},{id:'flashlight', label:'Flashlight + batteries'},
+  {id:'firstaid', label:'First aid kit', expiry:'2026-12'},{id:'meds', label:'Personal medications', expiry:'2026-06'},
+  {id:'docs', label:'Copies of documents'},{id:'cash', label:'Cash in small bills'},
+  {id:'charger', label:'Phone charger / power bank'},{id:'whistle', label:'Whistle'}
+];
+function getKit() {
+  try { const raw = localStorage.getItem('rally_kit'); if (raw) return JSON.parse(raw); } catch(_) {}
+  return defaultKit.map(k => Object.assign({}, k, {done:false}));
+}
+function renderKit() {
+  const kit = getKit();
+  const list = document.getElementById('kitList');
+  list.innerHTML = '';
+  kit.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'kit-item' + (item.done ? ' done' : '');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.id = 'kit_' + item.id; cb.checked = !!item.done;
+    const label = document.createElement('label');
+    label.htmlFor = cb.id; label.textContent = item.label;
+    row.appendChild(cb); row.appendChild(label);
+    if (item.expiry) {
+      const exp = document.createElement('span');
+      exp.className = 'expiry'; exp.textContent = item.expiry;
+      row.appendChild(exp);
+    }
+    cb.addEventListener('change', () => {
+      const k = getKit();
+      const f = k.find(x => x.id === item.id);
+      if (f) f.done = cb.checked;
+      try { localStorage.setItem('rally_kit', JSON.stringify(k)); } catch(_) {}
+      row.classList.toggle('done', cb.checked);
+      computeReadiness();
+    });
+    list.appendChild(row);
+  });
+}
+
+/* ---------------- Readiness ---------------- */
+function computeReadiness() {
+  const plan = getPlan();
+  const kit = getKit();
+  let personal = 0;
+  if (plan.name) personal += 25;
+  if (plan.contact) personal += 25;
+  if (plan.meeting) personal += 25;
+  if (plan.meds || plan.needs) personal += 25;
+  const kitDone = kit.filter(k => k.done).length;
+  const kitPct = kit.length ? Math.round(kitDone / kit.length * 100) : 0;
+  const rings = {personal: Math.min(100, personal), family: plan.contact ? 50 : 0, home: kitPct, neighborhood: 25};
+  const circum = {personal:176, family:302, home:427, neighborhood:553};
+  Object.keys(rings).forEach(name => {
+    const el = document.querySelector('.ring-fill[data-ring="' + name + '"]');
+    if (!el) return;
+    const c = circum[name];
+    el.style.strokeDashoffset = c - (c * rings[name] / 100);
+  });
+  window._rings = rings;
+  updateReadinessLegend();
+}
+function updateReadinessLegend() {
+  const labels = {
+    en:{personal:'Personal',family:'Family',home:'Home',neighborhood:'Neighborhood'},
+    es:{personal:'Personal',family:'Familia',home:'Hogar',neighborhood:'Vecindario'},
+    zh:{personal:'个人',family:'家庭',home:'住所',neighborhood:'社区'},
+    hi:{personal:'व्यक्तिगत',family:'परिवार',home:'घर',neighborhood:'पड़ोस'},
+    ar:{personal:'شخصي',family:'العائلة',home:'المنزل',neighborhood:'الحي'},
+    fa:{personal:'شخصی',family:'خانواده',home:'خانه',neighborhood:'محله'}
+  };
+  const L = labels[currentLang] || labels.en;
+  const rings = window._rings || {personal:0,family:0,home:0,neighborhood:0};
+  const legendText = document.querySelectorAll('.legend-item span:last-child');
+  const order = ['personal','family','home','neighborhood'];
+  legendText.forEach((el, i) => {
+    const key = order[i];
+    if (el) el.textContent = L[key] + ' — ' + rings[key] + '%';
+  });
+}
+
+/* ---------------- Circle ---------------- */
+function getCircle() { try { return JSON.parse(localStorage.getItem('rally_circle') || '{}'); } catch { return {}; } }
+function saveCircle(c) { try { localStorage.setItem('rally_circle', JSON.stringify(c)); } catch(_) {} }
+function getMembers() { const c = getCircle(); return Array.isArray(c.members) ? c.members : []; }
+function saveMembers(list) { const c = getCircle(); c.members = list; saveCircle(c); }
+
+function setStatus(state) {
+  circleState = state;
+  const chip = document.getElementById('statusChip');
+  if (!chip) return;
+  chip.className = 'status-chip ' + state;
+  const label = chip.querySelector('span');
+  const map = {online:'circle_status_online',offline:'circle_status_offline',connecting:'circle_status_connecting',unconfigured:'circle_status_unconfigured'};
+  label.textContent = t(map[state] || 'circle_status_unconfigured');
+  const btn = document.getElementById('connectBtn');
+  if (btn) btn.textContent = (state === 'online' || state === 'connecting') ? t('circle_disconnect') : t('circle_connect');
+}
+
+let _keyCache = null;
+async function getKey(pass, topic) {
+  if (_keyCache && _keyCache.pass === pass && _keyCache.topic === topic) return _keyCache.key;
+  const enc = new TextEncoder();
+  const baseKey = await crypto.subtle.importKey('raw', enc.encode(pass), 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey(
+    {name:'PBKDF2', salt: enc.encode('rally|' + topic), iterations: 120000, hash:'SHA-256'},
+    baseKey, {name:'AES-GCM', length: 256}, false, ['encrypt','decrypt']
+  );
+  _keyCache = {pass, topic, key};
+  return key;
+}
+async function encryptPayload(obj, pass, topic) {
+  const json = JSON.stringify(obj);
+  if (!HAS_SUBTLE) return 'PLAIN1:' + b64url(new TextEncoder().encode(json));
+  const key = await getKey(pass, topic);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, key, new TextEncoder().encode(json));
+  return 'RALLY1:' + b64url(iv) + ':' + b64url(new Uint8Array(ct));
+}
+async function decryptPayload(raw, pass, topic) {
+  if (raw.indexOf('PLAIN1:') === 0) {
+    return JSON.parse(new TextDecoder().decode(fromB64url(raw.slice(7))));
+  }
+  if (raw.indexOf('RALLY1:') !== 0) return null;
+  if (!HAS_SUBTLE) throw new Error('no crypto');
+  const parts = raw.split(':');
+  if (parts.length !== 3) return null;
+  const iv = fromB64url(parts[1]);
+  const ct = fromB64url(parts[2]);
+  const key = await getKey(pass, topic);
+  const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv}, key, ct);
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+async function ntfyPublish(body) {
+  const c = getCircle();
+  if (!c.topic) throw new Error('no topic');
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 9000);
+  try {
+    await fetch(NTFY_BASE + '/' + encodeURIComponent(c.topic), {
+      method:'POST', mode:'no-cors', body: body, signal: ctrl.signal
+    });
+    return true;
+  } finally { clearTimeout(timer); }
+}
+async function publishCircle(obj) {
+  const c = getCircle();
+  if (!c.topic || !c.pass) return false;
+  obj.senderId = deviceId();
+  obj.ts = Date.now();
+  let body;
+  try { body = await encryptPayload(obj, c.pass, c.topic); }
+  catch (err) { console.warn('encrypt failed', err); return false; }
+  try { await ntfyPublish(body); return true; }
+  catch (err) { console.warn('publish failed', err); return false; }
+}
+
+function unsubscribeCircle() {
+  if (esRetry) { clearTimeout(esRetry); esRetry = null; }
+  if (circleES) { try { circleES.close(); } catch(_) {} circleES = null; }
+}
+function subscribeCircle() {
+  const c = getCircle();
+  unsubscribeCircle();
+  if (!c.topic) { setStatus('unconfigured'); return; }
+  setStatus('connecting');
+  let es;
+  try { es = new EventSource(NTFY_BASE + '/' + encodeURIComponent(c.topic) + '/sse'); }
+  catch (err) { setStatus('offline'); return; }
+  circleES = es;
+  es.onopen = () => setStatus('online');
+  es.onerror = () => {
+    if (circleState !== 'offline') setStatus('offline');
+    if (es.readyState === 2) {
+      esRetry = setTimeout(() => { if (getCircle().topic) subscribeCircle(); }, 8000);
+    }
+  };
+  es.onmessage = (ev) => {
+    let msg;
+    try { msg = JSON.parse(ev.data); } catch(_) { return; }
+    if (!msg || msg.event !== 'message') return;
+    if (seenMsgIds.has(msg.id)) return;
+    seenMsgIds.add(msg.id);
+    if (seenMsgIds.size > 800) seenMsgIds.delete(seenMsgIds.values().next().value);
+    handleIncoming(msg.message, msg.id);
+  };
+}
+function connectCircle() {
+  const topicEl = document.getElementById('circleTopic');
+  const passEl = document.getElementById('circlePass');
+  const topic = sanitizeTopic(topicEl.value);
+  const pass = passEl.value.trim();
+  if (!topic) { toast('⚠ ' + t('circle_need_topic')); topicEl.focus(); return; }
+  if (!pass) { toast('⚠ ' + t('circle_need_pass')); passEl.focus(); return; }
+  topicEl.value = topic;
+  const c = getCircle();
+  c.topic = topic; c.pass = pass;
+  if (!Array.isArray(c.members)) c.members = [];
+  saveCircle(c);
+  _keyCache = null;
+  subscribeCircle();
+  toast('✓ ' + t('circle_saved'));
+}
+function disconnectCircle() {
+  unsubscribeCircle();
+  setStatus(getCircle().topic ? 'offline' : 'unconfigured');
+}
+async function handleIncoming(raw, msgId) {
+  if (!raw) return;
+  const c = getCircle();
+  if (!c.pass || !c.topic) return;
+  let obj;
+  try { obj = await decryptPayload(raw, c.pass, c.topic); }
+  catch (err) { console.warn('decrypt failed', err); return; }
+  if (!obj) return;
+  if (obj.senderId && obj.senderId === deviceId()) return;
+  if (obj.type === 'siren') {
+    playSirenSound();
+    showSirenAlert(obj.reason, obj.id || msgId, 'receiver', obj.name || '');
+    if (navigator.vibrate) { try { navigator.vibrate([200,100,200]); } catch(_) {} }
+  } else if (obj.type === 'cancel') {
+    stopSirenSound();
+    dismissSirenAlert();
+  } else if (obj.type === 'test') {
+    toast('✓ ' + t('circle_test') + (obj.name ? ' — ' + obj.name : ''));
+  }
+}
+
+function renderMembers() {
+  const list = document.getElementById('memberList');
+  if (!list) return;
+  const members = getMembers();
+  list.innerHTML = '';
+  if (!members.length) {
+    const p = document.createElement('p');
+    p.className = 'empty-note';
+    p.textContent = t('circle_no_members');
+    list.appendChild(p);
+    return;
+  }
+  members.forEach(m => {
+    const row = document.createElement('div');
+    row.className = 'member-row';
+    const av = document.createElement('div');
+    av.className = 'member-avatar';
+    av.textContent = (m.name || '?').trim().charAt(0).toUpperCase() || '?';
+    const info = document.createElement('div');
+    info.className = 'member-info';
+    const nameEl = document.createElement('div');
+    nameEl.className = 'member-name'; nameEl.textContent = m.name || '—';
+    const phoneEl = document.createElement('div');
+    phoneEl.className = 'member-phone'; phoneEl.textContent = m.phone || '';
+    info.appendChild(nameEl); info.appendChild(phoneEl);
+    const del = document.createElement('button');
+    del.className = 'member-del';
+    del.setAttribute('aria-label', t('circle_remove'));
+    del.textContent = '×';
+    del.addEventListener('click', () => {
+      saveMembers(getMembers().filter(x => x.id !== m.id));
+      renderMembers();
+    });
+    row.appendChild(av); row.appendChild(info); row.appendChild(del);
+    list.appendChild(row);
+  });
+}
+
+function smsTextFor(reason, name) { return 'RALLY SIREN — ' + reasonText(reason) + (name ? ' — ' + name : ''); }
+function showSmsFallback(reason) {
+  const panel = document.getElementById('smsPanel');
+  const links = document.getElementById('smsLinks');
+  if (!panel || !links) return;
+  const members = getMembers().filter(m => m.phone);
+  links.innerHTML = '';
+  const name = getPlan().name || '';
+  const text = smsTextFor(reason, name);
+  if (!members.length) {
+    const p = document.createElement('p');
+    p.textContent = t('siren_no_members');
+    p.style.color = '#ffd7e0'; p.style.fontSize = '.8rem';
+    links.appendChild(p);
+  } else {
+    members.forEach(m => {
+      const num = m.phone.replace(/[^\d+]/g, '');
+      const a = document.createElement('a');
+      a.className = 'sms-link';
+      a.href = 'sms:' + num + '?&body=' + encodeURIComponent(text);
+      const left = document.createElement('span'); left.textContent = m.name || num;
+      const right = document.createElement('span'); right.textContent = t('siren_send_sms');
+      a.appendChild(left); a.appendChild(right);
+      links.appendChild(a);
+    });
+  }
+  panel.classList.add('show');
+}
+function hideSmsFallback() {
+  const panel = document.getElementById('smsPanel');
+  if (panel) panel.classList.remove('show');
+}
+
+let sirenAudioCtx = null;
+let sirenNodes = null;
+function playSirenSound() {
+  try {
+    stopSirenSound();
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    sirenAudioCtx = new AC();
+    if (sirenAudioCtx.state === 'suspended') sirenAudioCtx.resume();
+    const osc = sirenAudioCtx.createOscillator();
+    const gain = sirenAudioCtx.createGain();
+    osc.type = 'sine';
+    osc.connect(gain); gain.connect(sirenAudioCtx.destination);
+    const now = sirenAudioCtx.currentTime;
+    gain.gain.value = 0.0001;
+    gain.gain.linearRampToValueAtTime(0.18, now + 0.05);
+    let tt = now;
+    for (let i = 0; i < 12; i++) {
+      osc.frequency.setValueAtTime(440, tt);
+      osc.frequency.linearRampToValueAtTime(880, tt + 0.4);
+      osc.frequency.linearRampToValueAtTime(440, tt + 0.8);
+      tt += 0.8;
+    }
+    gain.gain.linearRampToValueAtTime(0.0001, tt);
+    osc.start(now); osc.stop(tt + 0.1);
+    sirenNodes = {osc: osc, gain: gain};
+  } catch (err) { console.warn('Siren audio failed:', err); }
+}
+function stopSirenSound() {
+  if (!sirenAudioCtx) return;
+  try {
+    if (sirenNodes) {
+      sirenNodes.gain.gain.cancelScheduledValues(sirenAudioCtx.currentTime);
+      sirenNodes.gain.gain.setValueAtTime(0.0001, sirenAudioCtx.currentTime);
+      sirenNodes.osc.stop(sirenAudioCtx.currentTime + 0.05);
+    }
+    sirenAudioCtx.close();
+  } catch(_) {}
+  sirenAudioCtx = null;
+  sirenNodes = null;
+}
+
+const sirenChannel = ('BroadcastChannel' in window) ? new BroadcastChannel('rally_siren') : null;
+function broadcastSiren(reason, id, name) {
+  const payload = {type:'siren', reason: reason, id: id, name: name, ts: Date.now()};
+  if (sirenChannel) { try { sirenChannel.postMessage(payload); } catch(_) {} }
+  try { localStorage.setItem('rally_siren_event', JSON.stringify(payload)); } catch(_) {}
+}
+function broadcastCancel(id) {
+  const payload = {type:'cancel', id: id, ts: Date.now()};
+  if (sirenChannel) { try { sirenChannel.postMessage(payload); } catch(_) {} }
+  try { localStorage.setItem('rally_siren_event', JSON.stringify(payload)); } catch(_) {}
+}
+function reasonText(reason) {
+  const map = {help:t('siren_help'),medical:t('siren_medical'),fire:t('siren_fire'),flood:t('siren_flood'),unsafe:t('siren_unsafe')};
+  return map[reason] || reason;
+}
+function showSirenAlert(reason, id, role, fromName) {
+  currentSirenId = id;
+  sirenRole = role;
+  const overlay = document.getElementById('sirenOverlay');
+  document.getElementById('sirenOverlayReason').textContent = reasonText(reason);
+  const fromEl = document.getElementById('sirenFrom');
+  fromEl.textContent = (role === 'receiver' && fromName) ? (t('siren_from') + ': ' + fromName) : '';
+  const cancelBtn = document.getElementById('sirenCancelBtn');
+  const ackBtn = document.getElementById('sirenAckBtn');
+  if (role === 'sender') { cancelBtn.style.display = ''; ackBtn.style.display = 'none'; }
+  else { cancelBtn.style.display = 'none'; ackBtn.style.display = ''; }
+  hideSmsFallback();
+  overlay.classList.add('show');
+  let n = 10;
+  const countEl = document.getElementById('sirenCount');
+  countEl.textContent = n;
+  clearInterval(sirenCountdownTimer);
+  sirenCountdownTimer = setInterval(() => {
+    n--;
+    countEl.textContent = Math.max(0, n);
+    if (n <= 0) {
+      clearInterval(sirenCountdownTimer); sirenCountdownTimer = null;
+      if (sirenRole === 'sender') cancelSiren();
+      else stopSirenSound();
+    }
+  }, 1000);
+}
+function dismissSirenAlert() {
+  document.getElementById('sirenOverlay').classList.remove('show');
+  hideSmsFallback();
+  clearInterval(sirenCountdownTimer);
+  sirenCountdownTimer = null;
+  currentSirenId = null;
+}
+function cancelSiren() {
+  const id = currentSirenId;
+  stopSirenSound(); dismissSirenAlert();
+  if (id) {
+    broadcastCancel(id);
+    publishCircle({type:'cancel', id: id}).catch(() => {});
+  }
+  toast('✓ ' + t('siren_cancel_btn'));
+}
+function handleLocalMessage(data) {
+  if (!data) return;
+  if (data.type === 'siren') {
+    if (data.id === currentSirenId && sirenRole === 'sender') return;
+    playSirenSound();
+    showSirenAlert(data.reason, data.id, 'receiver', data.name || '');
+  } else if (data.type === 'cancel') {
+    stopSirenSound(); dismissSirenAlert();
+  }
+}
+if (sirenChannel) sirenChannel.onmessage = (e) => handleLocalMessage(e.data);
+window.addEventListener('storage', (e) => {
+  if (e.key === 'rally_siren_event' && e.newValue) {
+    try { handleLocalMessage(JSON.parse(e.newValue)); } catch(_) {}
+  }
+});
+
+const sirenBig = document.getElementById('sirenBig');
+const sirenMini = document.getElementById('sirenMini');
+let holdTimer = null;
+let selectedReason = 'help';
+document.querySelectorAll('.siren-reason').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.siren-reason').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedReason = btn.dataset.reason;
+  });
+});
+function startHold(e) {
+  if (e && e.cancelable && e.type === 'touchstart') e.preventDefault();
+  sirenBig.classList.add('holding');
+  clearTimeout(holdTimer);
+  holdTimer = setTimeout(() => {
+    sirenBig.classList.remove('holding');
+    triggerSiren();
+    holdTimer = null;
+  }, 2000);
+}
+function endHold() {
+  if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; sirenBig.classList.remove('holding'); }
+}
+sirenBig.addEventListener('mousedown', startHold);
+sirenBig.addEventListener('touchstart', startHold, {passive: false});
+sirenBig.addEventListener('mouseup', endHold);
+sirenBig.addEventListener('mouseleave', endHold);
+sirenBig.addEventListener('touchend', endHold);
+sirenBig.addEventListener('touchcancel', endHold);
+sirenBig.addEventListener('keydown', e => {
+  if ((e.code === 'Space' || e.code === 'Enter') && !e.repeat) { e.preventDefault(); if (!holdTimer) startHold(e); }
+});
+sirenBig.addEventListener('keyup', e => {
+  if (e.code === 'Space' || e.code === 'Enter') endHold();
+});
+async function triggerSiren() {
+  const id = String(Date.now());
+  const name = getPlan().name || '';
+  playSirenSound();
+  showSirenAlert(selectedReason, id, 'sender', '');
+  broadcastSiren(selectedReason, id, name);
+  if (navigator.vibrate) { try { navigator.vibrate([200,100,200]); } catch(_) {} }
+  const configured = !!getCircle().topic && !!getCircle().pass;
+  let ok = false;
+  if (configured && navigator.onLine) {
+    try { ok = await publishCircle({type:'siren', reason: selectedReason, id: id, name: name}); }
+    catch (err) { ok = false; }
+  }
+  if (!ok) {
+    setStatus(navigator.onLine ? (configured ? 'offline' : 'unconfigured') : 'offline');
+    if (currentSirenId === id) showSmsFallback(selectedReason);
+  }
+}
+document.getElementById('sirenCancelBtn').addEventListener('click', cancelSiren);
+document.getElementById('sirenAckBtn').addEventListener('click', () => {
+  stopSirenSound(); dismissSirenAlert();
+});
+sirenMini.addEventListener('click', () => document.getElementById('sec-siren').scrollIntoView({behavior:'smooth'}));
+
+document.getElementById('genTopicBtn').addEventListener('click', () => {
+  document.getElementById('circleTopic').value = 'rally-' + b64url(crypto.getRandomValues(new Uint8Array(8))).toLowerCase();
+});
+document.getElementById('genPassBtn').addEventListener('click', () => {
+  document.getElementById('circlePass').value = b64url(crypto.getRandomValues(new Uint8Array(12)));
+});
+document.getElementById('connectBtn').addEventListener('click', () => {
+  if (circleState === 'online' || circleState === 'connecting') disconnectCircle();
+  else connectCircle();
+});
+document.getElementById('copyInviteBtn').addEventListener('click', async () => {
+  const c = getCircle();
+  const topic = sanitizeTopic(document.getElementById('circleTopic').value) || c.topic;
+  const pass = document.getElementById('circlePass').value.trim() || c.pass;
+  if (!topic) { toast('⚠ ' + t('circle_need_topic')); return; }
+  if (!pass) { toast('⚠ ' + t('circle_need_pass')); return; }
+  const invite = 'RALLY|' + topic + '|' + pass;
+  try {
+    await navigator.clipboard.writeText(invite);
+    toast('✓ ' + t('circle_invite_copied'));
+  } catch(_) {
+    const ta = document.createElement('textarea');
+    ta.value = invite; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('✓ ' + t('circle_invite_copied')); }
+    catch(__) { toast(invite); }
+    document.body.removeChild(ta);
+  }
+});
+document.getElementById('addMemberBtn').addEventListener('click', () => {
+  const nameEl = document.getElementById('memberName');
+  const phoneEl = document.getElementById('memberPhone');
+  const name = nameEl.value.trim(), phone = phoneEl.value.trim();
+  if (!phone) { phoneEl.focus(); toast('⚠ ' + t('circle_member_phone')); return; }
+  const list = getMembers();
+  list.push({id:'m_' + Date.now(), name: name || phone, phone: phone});
+  saveMembers(list);
+  nameEl.value = ''; phoneEl.value = '';
+  renderMembers();
+  toast('✓ ' + t('circle_add_member'));
+});
+document.getElementById('testBtn').addEventListener('click', async () => {
+  const c = getCircle();
+  if (!c.topic || !c.pass) { toast('⚠ ' + t('circle_need_topic')); return; }
+  const ok = await publishCircle({type:'test', name: getPlan().name || ''});
+  toast(ok ? '✓ ' + t('circle_test') : '⚠ ' + t('circle_status_offline'));
+});
+
+/* ---------------- Drill ---------------- */
+let drillSeconds = 0;
+let drillInterval = null;
+function fmt(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+document.getElementById('drillStart').addEventListener('click', function () {
+  const btn = this;
+  if (drillInterval) {
+    clearInterval(drillInterval); drillInterval = null;
+    btn.textContent = t('drill_start'); btn.setAttribute('data-i18n', 'drill_start');
+    toast('■ ' + t('drill_reset'));
+    return;
+  }
+  drillInterval = setInterval(() => {
+    drillSeconds++;
+    document.getElementById('drillTimer').textContent = fmt(drillSeconds);
+  }, 1000);
+  btn.textContent = 'Stop'; btn.removeAttribute('data-i18n');
+});
+document.getElementById('drillReset').addEventListener('click', () => {
+  if (drillInterval) { clearInterval(drillInterval); drillInterval = null; }
+  drillSeconds = 0;
+  document.getElementById('drillTimer').textContent = '00:00';
+  const btn = document.getElementById('drillStart');
+  btn.textContent = t('drill_start'); btn.setAttribute('data-i18n', 'drill_start');
+});
+
+/* ---------------- Shelters ---------------- */
+const defaultShelters = [
+  {id:'s1', name:'Oak Community Center', distance:'1.2 km', accessible:true, pets:true},
+  {id:'s2', name:'Central High School', distance:'2.0 km', accessible:true, pets:false},
+  {id:'s3', name:'Riverside Gym', distance:'2.8 km', accessible:true, pets:true}
+];
+function getShelters() {
+  try { const raw = localStorage.getItem('rally_shelters'); if (raw) return JSON.parse(raw); } catch(_) {}
+  return defaultShelters.map(s => Object.assign({}, s));
+}
+function saveShelters(list) { try { localStorage.setItem('rally_shelters', JSON.stringify(list)); } catch(_) {} }
+function renderShelters() {
+  const list = getShelters();
+  const wrap = document.getElementById('shelterList');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  list.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'card shelter-card';
+    const del = document.createElement('button');
+    del.className = 'shelter-delete';
+    del.setAttribute('aria-label', t('shelter_delete'));
+    del.textContent = '×';
+    del.addEventListener('click', () => {
+      saveShelters(getShelters().filter(x => x.id !== s.id));
+      renderShelters();
+      toast('🗑 ' + t('shelter_delete'));
+    });
+    const h3 = document.createElement('h3');
+    h3.textContent = s.name;
+    const meta = document.createElement('div');
+    meta.className = 'shelter-meta';
+    meta.textContent = ((s.distance || '—') + ' · ' + (s.accessible ? '♿' : '') + ' ' + (s.pets ? '🐾' : '')).trim();
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-ghost';
+    btn.style.cssText = 'padding:8px 16px;font-size:.85rem';
+    btn.textContent = t('shelter_route');
+    card.appendChild(del); card.appendChild(h3); card.appendChild(meta); card.appendChild(btn);
+    wrap.appendChild(card);
+  });
+  if (!list.length) {
+    const empty = document.createElement('p');
+    empty.style.cssText = 'color:var(--text-dim);text-align:center;grid-column:1/-1';
+    empty.textContent = '—';
+    wrap.appendChild(empty);
+  }
+}
+document.getElementById('addShelterBtn').addEventListener('click', () => {
+  const name = document.getElementById('shelterName').value.trim();
+  const distance = document.getElementById('shelterDist').value.trim();
+  const accessible = document.getElementById('shelterAccessible').checked;
+  const pets = document.getElementById('shelterPets').checked;
+  if (!name) { toast('⚠ ' + t('shelter_name_label')); return; }
+  const list = getShelters();
+  list.push({id:'s_' + Date.now(), name: name, distance: distance, accessible: accessible, pets: pets});
+  saveShelters(list);
+  document.getElementById('shelterName').value = '';
+  document.getElementById('shelterDist').value = '';
+  document.getElementById('shelterAccessible').checked = false;
+  document.getElementById('shelterPets').checked = false;
+  renderShelters();
+  toast('✓ ' + t('shelter_add_btn'));
+});
+
+document.getElementById('printCardBtn').addEventListener('click', () => window.print());
+document.getElementById('langSelect').addEventListener('change', e => {
+  applyLang(e.target.value);
+  setTimeout(computeReadiness, 40);
+});
+
+/* ============================================================
+   PWA — manifest, service worker, install prompt
+   ============================================================ */
+const RALLY_ICON_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%2307101c'/%3E%3Ccircle cx='256' cy='256' r='180' fill='none' stroke='%237cc4ff' stroke-width='28' opacity='.35'/%3E%3Ccircle cx='256' cy='256' r='112' fill='none' stroke='%23f5b759' stroke-width='28' opacity='.6'/%3E%3Ccircle cx='256' cy='256' r='48' fill='%236ee7d3'/%3E%3C/svg%3E";
+
+function updatePwaManifest() {
+  const link = document.getElementById('pwaManifest');
+  if (!link) return;
+  const pageUrl = location.href.split(/[?#]/)[0];
+  const baseUrl = pageUrl.substring(0, pageUrl.lastIndexOf('/') + 1);
+  const manifest = {
+    name: 'RALLY',
+    short_name: 'RALLY',
+    description: 'Where every circle finds its center.',
+    start_url: pageUrl,
+    scope: baseUrl,
+    id: baseUrl,
+    display: 'standalone',
+    display_override: ['window-controls-overlay','standalone','minimal-ui'],
+    orientation: 'any',
+    background_color: '#07101c',
+    theme_color: '#07101c',
+    lang: currentLang || 'en',
+    dir: rtlLangs.includes(currentLang) ? 'rtl' : 'ltr',
+    categories: ['productivity','utilities','lifestyle','safety'],
+    icons: [
+      {src: RALLY_ICON_SVG, sizes: '192x192', type: 'image/svg+xml', purpose: 'any'},
+      {src: RALLY_ICON_SVG, sizes: '512x512', type: 'image/svg+xml', purpose: 'any'},
+      {src: RALLY_ICON_SVG, sizes: 'any', type: 'image/svg+xml', purpose: 'maskable'}
+    ],
+    shortcuts: [
+      {name: 'Siren', url: pageUrl + '#sec-siren', description: 'Open Family Siren'},
+      {name: 'Family Circle', url: pageUrl + '#sec-circle', description: 'Open Family Circle'}
+    ]
+  };
+  link.href = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(manifest));
+}
+
+/* Register the service worker.
+   The companion sw.js file must be saved next to this HTML file.
+   Without it, the app still works but is not installable. */
+async function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+  const proto = location.protocol;
+  const isSecure = proto === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (!isSecure) {
+    console.log('RALLY: service worker requires HTTPS or localhost. App works, but is not installable.');
+    return;
+  }
+  try {
+    const reg = await navigator.serviceWorker.register('./sw.js', {scope: './'});
+    console.log('RALLY: service worker registered. Scope:', reg.scope);
+  } catch (err) {
+    console.warn('RALLY: service worker registration failed. Save sw.js next to rally.html to enable PWA install.', err);
+  }
+}
+
+/* Install prompt */
+let deferredInstallPrompt = null;
+const installBtn = document.getElementById('installBtn');
+function setInstallBtnVisible(visible) {
+  if (!installBtn) return;
+  installBtn.hidden = !visible;
+  if (visible) installBtn.textContent = t('pwa_install');
+}
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  setInstallBtnVisible(true);
+});
+installBtn.addEventListener('click', async () => {
+  if (!deferredInstallPrompt) return;
+  try {
+    deferredInstallPrompt.prompt();
+    const choice = await deferredInstallPrompt.userChoice;
+    if (choice && choice.outcome === 'accepted') {
+      setInstallBtnVisible(false);
+    }
+  } catch (err) {
+    console.warn('install prompt failed', err);
+  }
+  deferredInstallPrompt = null;
+});
+window.addEventListener('appinstalled', () => {
+  setInstallBtnVisible(false);
+  deferredInstallPrompt = null;
+  toast('✓ ' + t('pwa_installed'));
+});
+/* Hide install button if already running as an installed app */
+if ((window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true) {
+  setInstallBtnVisible(false);
+}
+
+/* ---------------- Invite from URL hash ---------------- */
+function loadInviteFromHash() {
+  if (!location.hash || location.hash.indexOf('#join=') !== 0) return false;
+  let raw;
+  try { raw = decodeURIComponent(location.hash.slice(6)); } catch(_) { return false; }
+  const parts = raw.split('|');
+  if (parts[0] !== 'RALLY' || !parts[1] || !parts[2]) return false;
+  document.getElementById('circleTopic').value = sanitizeTopic(parts[1]);
+  document.getElementById('circlePass').value = parts[2];
+  const c = getCircle();
+  c.topic = sanitizeTopic(parts[1]);
+  c.pass = parts[2];
+  if (!Array.isArray(c.members)) c.members = [];
+  saveCircle(c);
+  _keyCache = null;
+  try { history.replaceState(null, '', location.pathname + location.search); } catch(_) {}
+  return true;
+}
+
+/* ---------------- Init ---------------- */
+function init() {
+  const cryptoWarn = document.getElementById('cryptoWarn');
+  if (cryptoWarn && !HAS_SUBTLE) cryptoWarn.style.display = 'block';
+
+  let savedLang = 'en';
+  try { savedLang = localStorage.getItem('rally_lang') || 'en'; } catch(_) {}
+  if (!i18n[savedLang]) savedLang = 'en';
+  document.getElementById('langSelect').value = savedLang;
+  applyLang(savedLang);
+
+  const c = getCircle();
+  if (c.topic) document.getElementById('circleTopic').value = c.topic;
+  if (c.pass) document.getElementById('circlePass').value = c.pass;
+
+  loadPlan();
+  renderKit();
+  renderShelters();
+  renderMembers();
+  computeReadiness();
+  updateRail();
+  updatePwaManifest();
+
+  const joined = loadInviteFromHash();
+  if (getCircle().topic && getCircle().pass) subscribeCircle();
+  else setStatus('unconfigured');
+  if (joined) toast('✓ ' + t('circle_saved'));
+
+  window.addEventListener('online', () => {
+    if (getCircle().topic && getCircle().pass) {
+      if (!circleES || circleES.readyState === 2) subscribeCircle();
+    }
+  });
+  window.addEventListener('offline', () => {
+    if (circleState === 'online' || circleState === 'connecting') setStatus('offline');
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      if (getCircle().topic && getCircle().pass) {
+        if (!circleES || circleES.readyState === 2) subscribeCircle();
+      }
+    }
+  });
+
+  /* PWA */
+  registerServiceWorker();
+
+  setTimeout(computeReadiness, 250);
+}
+init();
+</script>
+</body>
+</html>
